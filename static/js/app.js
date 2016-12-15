@@ -3,11 +3,11 @@ angular.module('app', ['ngRoute'])
 		$routeProvider
     		.when('/', {
      			controller:'TodoCtrl as myCtrl',
-    			templateUrl:'todo.html'
+    			templateUrl:'static/views/todo.html'
     		})
     		.when('/edit/:taskId', {
-    			controller:'UpdateCtrl',
-    			templateUrl:'update.html'
+    			controller:'UpdateCtrl as mainCtrl',
+    			templateUrl:'static/views/update.html'
     		})
     		.otherwise({
 				redirectTo: '/'
@@ -62,19 +62,15 @@ angular.module('app', ['ngRoute'])
 		}
     })
 
-    .controller('UpdateCtrl', function() {
-    	console.log(123);
-    	/* const update = this;
+    .controller('UpdateCtrl', function($http, $routeParams, $location) {
+    	const update = this;
     	const taskId = $routeParams.taskId;
 
     	update.getTask = function(id) {
-    		console.log(id);
-
     		$http({
         		method: 'GET',
         		url: '/todo/' + id
 			}).then(function(response) {
-				console.log(update.task);
         		update.task = response.data;
     		}, function(error) {
         		console.log(error);
@@ -88,14 +84,15 @@ angular.module('app', ['ngRoute'])
         		method: 'PUT',
         		url: '/todo/' + id,
         		data: {
-                    task: update.title
-                }
+                    task: update.task.title,
+                    done: update.task.done
+                },
+                headers: {'Content-Type': 'application/json'}
 			}).then(function(response) {
-				console.log(response.data);
-				// $scope.ServerResponse = data;
-        		// $scope.tasks = response.data;
+				console.log(response);
+				$location.path('/');
     		}, function(error) {
         		console.log(error);
     		});
-		}*/
+		}
     })

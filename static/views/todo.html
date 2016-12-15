@@ -1,14 +1,13 @@
-<p>Список задач: </p>
+<h2>Список задач</h2>
 <form ng-submit="myCtrl.addTask()">
-	<input type="text" ng-model="myCtrl.title" placeholder="Введите задачу"><br>
+	<input type="text" ng-model="myCtrl.title" placeholder="Введите задачу" maxlength="60"><br>
 	<button type="submit">Добавить задачу</button>
 </form>
 
 <ul>
-	<li ng-repeat="task in myCtrl.tasks">
-		<input type="checkbox" ng-model="task.done">
-		<span class="done-{{task.done}}">{{task.task}}</span>
-		<a ng-href="#/edit/{{task.id}}">Редактировать задачу</a>
+	<li class=task ng-repeat="task in myCtrl.tasks">
+		<span class="done-{{task.done}}">{{task.title}}</span>
+		<a class="update" ng-href="#/edit/{{task.id}}">Редактировать задачу</a>
 		<button type="button" ng-click="myCtrl.deleteTask(task.id)">Удалить задачу</button>
 	</li>
 </ul>

@@ -1,6 +1,6 @@
-<h1>Где H1?</h1>
-<form>
-	<input type="text"><br>
+<form ng-submit="mainCtrl.updateTask(mainCtrl.task.id)">
+	<input type="checkbox" ng-model="mainCtrl.task.done">
+	<input type="text" value="{{mainCtrl.task.title}}" ng-model="mainCtrl.task.title" maxlength="60"><br>
 	<button type="submit">Изменить</button>
 	<a href="#/">Отмена</a>
 </form>

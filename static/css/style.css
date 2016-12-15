@@ -1,0 +1,32 @@
+body {
+	background: #ADD8E6;
+	font-family: sans-serif;
+}
+
+li {
+	list-style-type: none;
+	position: relative;
+}
+
+.task {
+	background: #A4D3EE;
+	border: 1px solid rgba(0, 89, 181, 0.82);
+	width: 600px;
+	margin: 0 0 5px;
+	box-shadow: 2px 2px 5px -1px rgb(0, 81, 202);
+	padding: 3px 5px;
+}
+
+.done-true {
+    text-decoration: line-through;
+    color: grey;
+}
+
+.update {
+  color: white;
+  text-decoration: none;
+  padding: .2em 1em calc(.2em + 3px);
+  border-radius: 3px;
+} 
+
+.update:hover { background: #53868B; }
