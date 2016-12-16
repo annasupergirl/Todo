@@ -1,13 +1,13 @@
 <h2>Список задач</h2>
-<form ng-submit="myCtrl.addTask()">
-	<input type="text" ng-model="myCtrl.title" placeholder="Введите задачу" maxlength="60"><br>
+<form ng-submit="todoVm.addTask()">
+	<input type="text" ng-model="todoVm.title" placeholder="Введите задачу" maxlength="60"><br>
 	<button type="submit">Добавить задачу</button>
 </form>
 
 <ul>
-	<li class=task ng-repeat="task in myCtrl.tasks">
+	<li class=task ng-repeat="task in todoVm.tasks">
 		<span class="done-{{task.done}}">{{task.title}}</span>
-		<a class="update" ng-href="#/edit/{{task.id}}">Редактировать задачу</a>
-		<button type="button" ng-click="myCtrl.deleteTask(task.id)">Удалить задачу</button>
+		<a class="update" ng-href="#/edit/{{task._id.$oid}}">Редактировать задачу</a>
+		<button type="button" ng-click="todoVm.deleteTask(task._id.$oid)">Удалить задачу</button>
 	</li>
 </ul>

@@ -1,98 +1,95 @@
-angular.module('app', ['ngRoute'])
-	.config(function($routeProvider) {
+(function() {
+    'use strict';
+
+    angular.module('app', ['ngRoute'])
+		.config(config)
+		.controller('TodoCtrl', TodoCtrl)
+		.controller('UpdateCtrl', UpdateCtrl);
+
+	function config($routeProvider) {
 		$routeProvider
     		.when('/', {
-     			controller:'TodoCtrl as myCtrl',
-    			templateUrl:'static/views/todo.html'
+     			controller:'TodoCtrl',
+     			controllerAs: 'todoVm',
+	    		templateUrl:'static/views/todo.html'
     		})
-    		.when('/edit/:taskId', {
-    			controller:'UpdateCtrl as mainCtrl',
+			.when('/edit/:taskId', {
+    			controller:'UpdateCtrl',
+    			controllerAs: 'updateVm',
     			templateUrl:'static/views/update.html'
-    		})
+	   		})
     		.otherwise({
 				redirectTo: '/'
 			});
-	})
+	}
 
-    .controller('TodoCtrl', function($http) {
-    	const todoList = this;
+    function TodoCtrl($http) {
+    	var vm = this;
 
-    	todoList.showlist = function() {
-    		$http({
-        		method: 'GET',
-        		url: '/todo'
-			}).then(function(response) {
-        		todoList.tasks = response.data;
-    		}, function(error) {
-        		console.log(error);
-    		});
-		},
+    	vm.showlist = showlist;
+    	vm.addTask = addTask;
+    	vm.deleteTask = deleteTask;
 
-		todoList.showlist();
+    	vm.showlist();
 
-    	todoList.addTask = function() {
-            $http({
-                method: 'POST',
-                url: '/todo',
+    	function showlist() {
+			return $http.get('/todo')
+				.then(function(response) { vm.tasks = response.data; })
+        		.catch(function(error) { console.log(error); });
+		}
+
+    	function addTask() {
+           	$http({
+               	method: 'POST',
+	            url: '/todo',
                 data: {
-                    task: todoList.title,
-                    done: false
+        	        task: vm.title,
+            	    done: false
                 },
-                headers: {'Content-Type': 'application/json'}
-            }).then(function(response) {
-            	todoList.title = '';
-            }, function(error) {
-                console.log(error);
-            });
+	            headers: {'Content-Type': 'application/json'}
+    	    })
+           	.then(function() { vm.title = ''; })
+        	.catch(function(error) { console.log(error); });
 
-            todoList.showlist();
-        },
+            vm.showlist();
+        }
 
-		todoList.deleteTask = function(id) {
-			$http({
-        		method: 'DELETE',
-        		url: '/todo/' + id
-			}).then(function(response) {
-				console.log(response);
-    		}, function(error) {
-        		console.log(error);
-    		});
+		function deleteTask(id) {
+			$http.delete('/todo/' + id)
+				.then(function(response) { console.log(response); })
+        		.catch(function(error) { console.log(error); });
 
-    		todoList.showlist();
+    		vm.showlist();
 		}
-    })
+   	}
 
-    .controller('UpdateCtrl', function($http, $routeParams, $location) {
-    	const update = this;
-    	const taskId = $routeParams.taskId;
+    function UpdateCtrl($http, $routeParams, $location) {
+    	var vm = this,
+    	    taskId = $routeParams.taskId;
 
-    	update.getTask = function(id) {
-    		$http({
-        		method: 'GET',
-        		url: '/todo/' + id
-			}).then(function(response) {
-        		update.task = response.data;
-    		}, function(error) {
-        		console.log(error);
-    		});
-    	},
+    	vm.getTask = getTask;
+    	vm.updateTask = updateTask;
 
-    	update.getTask(taskId);
+    	vm.getTask(taskId);
 
-    	update.updateTask = function(id) {
-			$http({
-        		method: 'PUT',
-        		url: '/todo/' + id,
+	    function getTask(id) {
+			return $http.get('/todo/' + id)
+    			.then(function(response) { vm.task = response.data; })
+        		.catch(function(error) { console.log(error); });
+    	}
+
+    	function updateTask(id) {
+			return $http({
+        		method: 'PATCH',
+	       		url: '/todo/' + id,
         		data: {
-                    task: update.task.title,
-                    done: update.task.done
-                },
-                headers: {'Content-Type': 'application/json'}
-			}).then(function(response) {
-				console.log(response);
-				$location.path('/');
-    		}, function(error) {
-        		console.log(error);
-    		});
+       	            task: vm.task.title,
+           	        done: vm.task.done
+               	},
+	            headers: {'Content-Type': 'application/json'}
+			})
+			.then(function() { $location.path('/'); })
+        	.catch(function(error) { console.log(error); });
 		}
-    })
+    }
+})();

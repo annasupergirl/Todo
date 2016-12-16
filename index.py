@@ -1,8 +1,9 @@
 import pymongo, json
 
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, abort
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+from bson import json_util
 
 app = Flask(__name__)
 mongo = MongoClient()
@@ -17,40 +18,28 @@ def index():
 def getTaskList():
     try:
         tasks = db.todo_list.find()
-        
-        taskList = []
-        for task in tasks:
-            taskItem = {
-                'id': str(task['_id']),
-                'title': task['title'],
-                'done': task['done']
-            }
-            taskList.append(taskItem)
 
+        return json_util.dumps(tasks)
     except Exception,e:
-        return str(e)
-    return json.dumps(taskList)
+        return jsonify(status='ERROR',message=str(e))
 
 @app.route('/todo/<string:task_id>',methods=['GET'])
 def getTask(task_id):
     try:
-        tasks = db.todo_list.find({'_id':ObjectId(task_id)})
-        
-        for task in tasks:
-            taskItem = {
-                'id': str(task['_id']),
-                'title': task['title'],
-                'done': task['done']
-            }
+        task = db.todo_list.find_one({'_id':ObjectId(task_id)})
+
+        if task:
+            return json_util.dumps(task)
+        else:
+            abort(404)
 
     except Exception,e:
-        return str(e)
-    return json.dumps(taskItem)
+        return jsonify(status='ERROR',message=str(e))
 
 @app.route('/todo',methods=['POST'])
 def addTask():
     try:
-        json_data = json.loads(request.data)
+        json_data = json.loads(request.data) 
         title = json_data['task']
         done = json_data['done']
 
@@ -60,7 +49,7 @@ def addTask():
     except Exception,e:
         return jsonify(status='ERROR',message=str(e))
 
-@app.route('/todo/<string:task_id>',methods=['PUT'])
+@app.route('/todo/<string:task_id>',methods=['PATCH'])
 def updateTask(task_id):
     try:
         taskInfo = json.loads(request.data)

@@ -1,6 +1,6 @@
-<form ng-submit="mainCtrl.updateTask(mainCtrl.task.id)">
-	<input type="checkbox" ng-model="mainCtrl.task.done">
-	<input type="text" value="{{mainCtrl.task.title}}" ng-model="mainCtrl.task.title" maxlength="60"><br>
+<form ng-submit="updateVm.updateTask(updateVm.task._id.$oid)">
+	<input type="checkbox" ng-model="updateVm.task.done">
+	<input type="text" value="{{updateVm.task.title}}" ng-model="updateVm.task.title" maxlength="60"><br>
 	<button type="submit">Изменить</button>
 	<a href="#/">Отмена</a>
 </form>
