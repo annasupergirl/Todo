@@ -1,6 +1,6 @@
 import pymongo, json
 
-from flask import Flask, render_template, jsonify, request, abort
+from flask import Flask, render_template, jsonify, request
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from bson import json_util
@@ -9,6 +9,15 @@ app = Flask(__name__)
 mongo = MongoClient()
 
 db = mongo.todo_database
+
+def make_error(status_code, message):
+    response = jsonify({
+        'status': 'ERROR',
+        'message': message
+    })
+    response.status_code = status_code
+
+    return response
 
 @app.route('/')
 def index():
@@ -21,7 +30,7 @@ def getTaskList():
 
         return json_util.dumps(tasks)
     except Exception,e:
-        return jsonify(status='ERROR',message=str(e))
+        return make_error(503, str(e))
 
 @app.route('/todo/<string:task_id>',methods=['GET'])
 def getTask(task_id):
@@ -31,10 +40,10 @@ def getTask(task_id):
         if task:
             return json_util.dumps(task)
         else:
-            abort(404)
+            return make_error(404, "404: Not Found")
 
     except Exception,e:
-        return jsonify(status='ERROR',message=str(e))
+        return make_error(503, str(e))
 
 @app.route('/todo',methods=['POST'])
 def addTask():
@@ -47,7 +56,7 @@ def addTask():
         return jsonify(status='OK',message='inserted successfully')
 
     except Exception,e:
-        return jsonify(status='ERROR',message=str(e))
+        return make_error(503, str(e))
 
 @app.route('/todo/<string:task_id>',methods=['PATCH'])
 def updateTask(task_id):
@@ -59,7 +68,7 @@ def updateTask(task_id):
         db.todo_list.update_one({'_id':ObjectId(task_id)},{'$set':{'title':title, 'done':done}})
         return jsonify(status='OK',message='updated successfully')
     except Exception, e:
-        return jsonify(status='ERROR',message=str(e))
+        return make_error(503, str(e))
 
 @app.route('/todo/<string:task_id>',methods=['DELETE'])
 def deleteTask(task_id):
@@ -67,7 +76,7 @@ def deleteTask(task_id):
         db.todo_list.delete_one({'_id':ObjectId(task_id)})
         return jsonify(status='OK',message='deletion successful')
     except Exception, e:
-        return jsonify(status='ERROR',message=str(e))
+        return make_error(503, str(e))
 
 if __name__ == "__main__":
     app.run()
